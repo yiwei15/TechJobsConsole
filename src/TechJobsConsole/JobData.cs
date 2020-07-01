@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 
@@ -13,7 +14,8 @@ namespace TechJobsConsole
         public static List<Dictionary<string, string>> FindAll()
         {
             LoadData();
-            return AllJobs;
+            return new List<Dictionary<string, string>> (AllJobs);
+           // return AllJobs;
         }
 
         /*
@@ -25,16 +27,22 @@ namespace TechJobsConsole
             LoadData();
 
             List<string> values = new List<string>();
+            List<string> valuesLowercase = new List<string>();
 
             foreach (Dictionary<string, string> job in AllJobs)
             {
                 string aValue = job[column];
+                string aValueLowercase = job[column].ToLower();
 
-                if (!values.Contains(aValue))
+                if (!valuesLowercase.Contains(aValueLowercase))
                 {
                     values.Add(aValue);
+                    valuesLowercase.Add(aValueLowercase);
                 }
             }
+
+            values.Sort();
+
             return values;
         }
 
@@ -43,13 +51,15 @@ namespace TechJobsConsole
             // load data, if not already loaded
             LoadData();
 
+            string lowercaseValue = value.ToLower();
+
             List<Dictionary<string, string>> jobs = new List<Dictionary<string, string>>();
 
             foreach (Dictionary<string, string> row in AllJobs)
             {
-                string aValue = row[column];
+                string aValue = row[column].ToLower();
 
-                if (aValue.Contains(value))
+                if (aValue.Contains(lowercaseValue))
                 {
                     jobs.Add(row);
                 }
@@ -57,6 +67,33 @@ namespace TechJobsConsole
 
             return jobs;
         }
+
+        public static List<Dictionary<string, string>> FindByValue(string value)
+        {
+            LoadData();
+
+            string lowercaseValue = value.ToLower();
+
+            List<Dictionary<string, string>> jobs = new List<Dictionary<string, string>>();
+
+            foreach (Dictionary<string, string> job in AllJobs)
+            {
+                List<string> keyList = job.Keys.ToList();
+                for (int i = 0; i < keyList.Count; i ++)
+                {
+                    string aValue = job[keyList[i]].ToLower();
+                    if (aValue.Contains(lowercaseValue))
+                    {
+                        jobs.Add(job);
+                        break;
+                    }
+                }
+            }
+
+            return jobs;
+
+        }
+
 
         /*
          * Load and parse data from job_data.csv
